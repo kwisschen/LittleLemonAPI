@@ -1,6 +1,12 @@
 from rest_framework import serializers
-from .models import MenuItem, Cart, Order, OrderItem
+from .models import Category, MenuItem, Cart, Order, OrderItem
 from django.contrib.auth.models import User
+
+
+class CategorySerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'title', 'slug']
 
 
 class MenuItemSerializer(serializers.ModelSerializer):
@@ -16,6 +22,10 @@ class UserSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     menuitem = MenuItemSerializer(read_only=True)
+
+    def validate(self, attrs):
+        attrs['price'] = attrs['quantity'] * attrs['unit_price']
+        return attrs
 
     class Meta:
         model = Cart
